@@ -33,7 +33,7 @@ And the payload:
   "usr": "xavier"
 }
 ```
-The key `lvl` tells the API if a user is a worker (level 0), or an admin (level 1). For the purpose of this API, tokens does not expire. The last part of the token is the signature. The API gets the signing key from an environment variable name `SIGNKEY17`, and has to be encoded in base64. Obviously the tokens must be signed with the same key, otherwise the API will not accept the token and the request will result in a forbidden response.
+The key `lvl` tells the API if a user is a worker (level 0), or an admin (level 1). For the purpose of this API, tokens does not expire. The last part of the token is the signature. The API gets the signing key from an environment variable named `SIGNKEY17`, and has to be encoded in base64. Obviously tokens must be signed with the same key, otherwise the API will not accept the token and the request will result in a forbidden response.
 
 ## Database
 
@@ -55,6 +55,6 @@ There is one endpoint with three methods. Assuming we are running in localhost, 
 - `GET http://localhost/{userid}`: return shifts from specific user.
 - `DELETE http://localhost/{userid}{day}{shift}`: delete the shift.
 
-## Format
+## Output format
 
 Errors are returned in plain text. All other data is returned as a JSON.
