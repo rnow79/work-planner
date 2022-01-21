@@ -30,11 +30,12 @@ func logLine(format string, v ...interface{}) {
 	}
 }
 
-// Response functions
+// Send errors as 400 - Bad Request
 func sendBadRequest(w http.ResponseWriter, err string) {
 	http.Error(w, err, http.StatusBadRequest)
 }
 
+// Serialize objects in JSON and send
 func sendJSON(w http.ResponseWriter, obj interface{}) {
 	json, _ := json.Marshal(obj)
 	w.Header().Set("Content-Type", "text/json; charset=utf-8")
@@ -46,10 +47,8 @@ func parseToken(token string) (planner.User, error) {
 	var returnUser planner.User
 	var retErr error = errors.New("error parsing the token")
 	if len(signKey) == 0 {
-		logLine("I don't have a signature key")
-		return returnUser, retErr
+		log.Fatalln("I don't have a signature key") // panic
 	}
-	//	logLine("Token: %s", token)
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -85,12 +84,13 @@ func shiftHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
+	// Here we have a valid user
 	switch r.Method {
 	case http.MethodGet:
 		if httpUser.IsAdmin() {
 			// Admin GET Method
 			if userid := r.URL.Query().Get("userid"); len(userid) == 0 {
+				// Without params, send all working plan
 				sendJSON(w, workingPlan)
 				return
 			} else {
@@ -99,6 +99,7 @@ func shiftHandler(w http.ResponseWriter, r *http.Request) {
 					sendBadRequest(w, "userid must be numeric")
 					return
 				}
+				// Send specific user shifts
 				sendJSON(w, workingPlan.GetUserShifts(userid))
 			}
 		} else {
@@ -128,14 +129,17 @@ func shiftHandler(w http.ResponseWriter, r *http.Request) {
 					sendBadRequest(w, "shift must be numeric")
 					return
 				}
+				// Try to insert shift
 				err = workingPlan.InsertUserShift(httpUser.UserId, day, shift)
 				if err != nil {
 					sendBadRequest(w, err.Error())
 					return
 				}
+				// If not already present, insert user
 				if !workingPlan.HasUser(httpUser.UserId) {
 					workingPlan.InsertUser(httpUser)
 				}
+				// Send current user shifts
 				sendJSON(w, workingPlan.GetUserShifts(httpUser.UserId))
 				return
 			}
@@ -162,6 +166,7 @@ func shiftHandler(w http.ResponseWriter, r *http.Request) {
 					sendBadRequest(w, "shift must be numeric")
 					return
 				}
+				// Try to delete user shift
 				err = workingPlan.DeleteUserShift(userid, day, shift)
 				if err != nil {
 					sendBadRequest(w, err.Error())
@@ -184,6 +189,7 @@ func shiftHandler(w http.ResponseWriter, r *http.Request) {
 					sendBadRequest(w, "shift must be numeric")
 					return
 				}
+				// Try to delete user shift
 				err = workingPlan.DeleteUserShift(httpUser.UserId, day, shift)
 				if err != nil {
 					sendBadRequest(w, err.Error())
@@ -192,47 +198,29 @@ func shiftHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	//	return
 }
 
-// Public method (just for debugging)
-func whoAmI(w http.ResponseWriter, r *http.Request) {
-	user, err := parseToken(r.Header.Get("Auth-Token"))
-	if err != nil {
-		logLine("Request did not pass the token auth process")
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
-	fmt.Fprintf(w, "\n\nUser: %s\n", user.User)
-	fmt.Fprintf(w, "Name: %s\n", user.Name)
-	fmt.Fprintf(w, "Level: %d\n", user.Level)
-	fmt.Fprintf(w, "Userid: %d\n", user.UserId)
-}
 func main() {
 	// Look for signing key environ variable
 	keyFromEnv := os.Getenv(kName)
 
+	// No environment variable found, inform and stop execution
 	if len(keyFromEnv) == 0 {
 		log.Println("Token signing key not found in environment!")
 		log.Printf("Its name must be %s. Please create it (b64 encoded).", kName)
 		log.Fatalln("Aborting execution.")
 	}
 
-	// If the key is base64 encoded, decode it
+	// Decode the key
 	var err error
 	signKey, err = base64.StdEncoding.DecodeString(keyFromEnv)
 	if err != nil || len(signKey) == 0 {
 		log.Fatalln("Environ variable", kName, "must be base64 encoded.")
 	}
-
-	// Initialize our workingplan
-
-	// Create HTTP server
+	// Create router
 	router := mux.NewRouter()
 	router.HandleFunc("/", shiftHandler).Methods(http.MethodGet, http.MethodPost, http.MethodDelete)
-	router.HandleFunc("/whoami", whoAmI).Methods(http.MethodGet)
-
+	// Create HTTP server
 	server := &http.Server{Handler: router, Addr: ":" + strconv.Itoa(port), WriteTimeout: 10 * time.Second, ReadTimeout: 10 * time.Second}
 	server.ListenAndServe()
 }
