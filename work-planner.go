@@ -42,7 +42,7 @@ func sendJSON(w http.ResponseWriter, obj interface{}) {
 	fmt.Fprintf(w, "%s", string(json))
 }
 
-// Parse and Validate token. if valid, fill struct user and return it
+// Parse and Validate token. If valid, fill struct user and return it
 func parseToken(token string) (planner.User, error) {
 	var returnUser planner.User
 	var retErr error = errors.New("error parsing the token")
