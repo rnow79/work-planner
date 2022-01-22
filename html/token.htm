@@ -1,0 +1,65 @@
+<html>
+<head>
+    <title>Token Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="frm">
+        <div id="title">Token Generator</div>
+        <div id="error" class="resultErr"></div>
+        <p>
+            <label default="enter username">Username</label>
+            <input id="usr" type="text">
+        </p>
+        <p>
+            <label> Friendly Name</label>
+            <input id="nam" type="text">
+        </p>
+        <p>
+            <label>User ID</label>
+            <input id="uid" type="text">
+        </p>
+        <p>
+            <label>User Level</label>
+            <input id="lvl" type="text">
+        </p>
+        <div id="generate">Generate</div>
+    </div>
+    <div id="result"></div>
+    <script lang="javascript">
+        $("#generate").click(e => {
+            $("input").each((i, e) => {
+                if ($(e).val() == "") {
+                    $("#error").fadeOut("fast", function() {$(this).html("Please fill all fields!").fadeIn("slow")})
+                    return;
+                }
+                $("#error").html("");
+            });
+            const settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "http://localhost/token",
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                "data": {
+                    "nam": $("#nam").val(),
+                    "usr": $("#usr").val(),
+                    "lvl": $("#lvl").val(),
+                    "uid": $("#uid").val(),
+                    "": ""
+                }
+            };
+            
+            $.ajax(settings).done(function (response) {
+                $("#result").html(response);
+            });
+        });
+    </script>
+</body>
+</html>

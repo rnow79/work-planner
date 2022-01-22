@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 // getShifts Endpoint: admins can get all shifts of the week, or a specific user's
@@ -95,6 +97,40 @@ func deleteShiftsEndpoint(w http.ResponseWriter, r *http.Request) {
 			sendBadRequest(w, err.Error())
 			return
 		}
+	}
+}
+
+// Anonymous function for creating tokens with the current server signing key
+func getTokenEndpoint(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	if usr, nam, lvl, uid := r.PostForm.Get("usr"), r.PostForm.Get("nam"), r.PostForm.Get("lvl"), r.PostForm.Get("uid"); len(usr) == 0 || len(nam) == 0 || len(lvl) == 0 || len(uid) == 0 {
+		fmt.Fprintf(w, "error: not enough parameters")
+		return
+	} else {
+		i, err := strconv.Atoi(uid)
+		if err != nil {
+			fmt.Fprintf(w, "error: uid must be a integer")
+			return
+		}
+		if i < 0 {
+			fmt.Fprint(w, "error: uid must be 0 or higher")
+			return
+		}
+		l, err := strconv.Atoi(lvl)
+		if err != nil {
+			fmt.Fprint(w, "error: lvl must be integer")
+			return
+		}
+		if l != 0 && l != 1 {
+			fmt.Fprint(w, "error: level must be 0 or 1")
+			return
+		}
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"usr": usr, "nam": nam, "uid": i, "lvl": l})
+		signed, err := token.SignedString([]byte(signKey))
+		if err != nil {
+			log.Fatalln("Error signing token")
+		}
+		fmt.Fprintf(w, signed)
 	}
 }
 

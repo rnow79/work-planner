@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -17,6 +18,12 @@ const headerName string = "Auth-Token" // Token header name
 // Each request must include a header with a valid token, otherwise a forbidden response is sent
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Exclude static directory and token generation api
+		if strings.HasPrefix(strings.ToLower(r.RequestURI), "/html") || strings.HasPrefix(strings.ToLower(r.RequestURI), "/token") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		// Extract user from token
 		user, err := extractToken(r.Header.Get(headerName))
 		if err != nil {

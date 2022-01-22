@@ -37,7 +37,11 @@ func main() {
 	// Register auth middleware. It will parse and validate the client auth token. If the token is valid
 	// it will put the data in the request header and will pass the request to the final endpoint
 	router.Use(authMiddleware)
-	// Register our endpoints
+	// Register static directory
+	router.PathPrefix("/html").Handler(http.StripPrefix("/html/", http.FileServer(http.Dir("./html/"))))
+	// Register token generation endpoint
+	router.HandleFunc("/token", getTokenEndpoint).Methods(http.MethodPost)
+	// Register workplanner endpoints
 	router.HandleFunc("/", getShiftsEndpoint).Methods(http.MethodGet)
 	router.HandleFunc("/", postShiftsEndpoint).Methods(http.MethodPost)
 	router.HandleFunc("/", deleteShiftsEndpoint).Methods(http.MethodDelete)
