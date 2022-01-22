@@ -109,7 +109,7 @@ func getTokenEndpoint(w http.ResponseWriter, r *http.Request) {
 	} else {
 		i, err := strconv.Atoi(uid)
 		if err != nil {
-			fmt.Fprintf(w, "error: uid must be a integer")
+			fmt.Fprintf(w, "error: uid must be an integer")
 			return
 		}
 		if i < 0 {
@@ -118,7 +118,7 @@ func getTokenEndpoint(w http.ResponseWriter, r *http.Request) {
 		}
 		l, err := strconv.Atoi(lvl)
 		if err != nil {
-			fmt.Fprint(w, "error: lvl must be integer")
+			fmt.Fprint(w, "error: lvl must be an integer")
 			return
 		}
 		if l != 0 && l != 1 {
