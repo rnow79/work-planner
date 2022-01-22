@@ -125,7 +125,7 @@ func getTokenEndpoint(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, "error: level must be 0 or 1")
 			return
 		}
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"usr": usr, "nam": nam, "uid": i, "lvl": l})
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"usr": usr, "nam": nam, "uid": uid, "lvl": lvl})
 		signed, err := token.SignedString([]byte(signKey))
 		if err != nil {
 			log.Fatalln("Error signing token")
