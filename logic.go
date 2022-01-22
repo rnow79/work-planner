@@ -15,11 +15,6 @@ type User struct {
 	UserId int    `json:"userid"` // unique user id
 }
 
-// Return if the user is admin or not
-func (u *User) IsAdmin() bool {
-	return u.Level == 1
-}
-
 // Shift struct
 type Shift struct {
 	Used   bool `json:"used"`
