@@ -3,9 +3,9 @@ package planner
 import "errors"
 
 // Variables
-const shiftsPerDay int = 3
-const maxShiftsPerUserPerDay int = 1
-const maxShiftsPerUserPerWeek int = 5
+const shiftsPerDay int = 3            // Amount of shifts per day
+const maxShiftsPerUserPerDay int = 1  // Maximum shifts a user is allowed to own per day
+const maxShiftsPerUserPerWeek int = 5 // Maximum shifts a user is allowed to own per week
 
 // User struct
 type User struct {
@@ -15,6 +15,7 @@ type User struct {
 	UserId int    `json:"userid"` // unique user id
 }
 
+// Return if the user is admin or not
 func (u *User) IsAdmin() bool {
 	return u.Level == 1
 }
@@ -48,7 +49,7 @@ type WorkingPlan struct {
 	Days  [7]Day `json:"days"`
 }
 
-// Checks if user data is present in the workplan
+// Checks the workplan has information about a user
 func (w *WorkingPlan) HasUser(userid int) bool {
 	for _, user := range w.Users {
 		if user.UserId == userid {
@@ -58,7 +59,7 @@ func (w *WorkingPlan) HasUser(userid int) bool {
 	return false
 }
 
-// Returns user data in the workplan
+// Returns user data from the workplan
 func (w *WorkingPlan) getUser(userid int) User {
 	u := &User{}
 	for _, user := range w.Users {
@@ -160,9 +161,9 @@ func (w *WorkingPlan) DeleteUserShift(userid int, day int, shift int) error {
 		w.Days[day].Shifts[shift].Used = false
 		w.Days[day].Shifts[shift].Userid = 0
 	} else {
-		return errors.New("user does not have that shift")
+		return errors.New("user does not own the shift")
 	}
-	// If user has no remaining shifts in the planner, delete the user from planner user data
+	// If user has no remaining shifts in the planner, delete his data from planner
 	if w.getUserShifCount(userid) == 0 {
 		w.deleteUser(userid)
 	}

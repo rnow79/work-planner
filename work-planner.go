@@ -64,7 +64,6 @@ func parseToken(token string) (planner.User, error) {
 		logLine("error validating the token")
 		return returnUser, retErr
 	}
-
 	// Extract claims from interface and return
 	returnUser.User, _ = claims["usr"].(string)
 	returnUser.Name, _ = claims["nam"].(string)
@@ -200,17 +199,16 @@ func shiftHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Main function
 func main() {
 	// Look for signing key environ variable
 	keyFromEnv := os.Getenv(kName)
-
 	// No environment variable found, inform and stop execution
 	if len(keyFromEnv) == 0 {
 		log.Println("Token signing key not found in environment!")
 		log.Printf("Its name must be %s. Please create it (b64 encoded).", kName)
 		log.Fatalln("Aborting execution.")
 	}
-
 	// Decode the key
 	var err error
 	signKey, err = base64.StdEncoding.DecodeString(keyFromEnv)
