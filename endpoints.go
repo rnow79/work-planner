@@ -8,46 +8,6 @@ import (
 	"strconv"
 )
 
-// Log a line if the program is running in verbose mode
-func logLine(format string, v ...interface{}) {
-	if verbose {
-		log.Println(fmt.Sprintf(format, v...))
-	}
-}
-
-// Send errors as 400 - Bad Request
-func sendBadRequest(w http.ResponseWriter, err string) {
-	http.Error(w, err, http.StatusBadRequest)
-}
-
-// Send forbidden
-func sendForbidden(w http.ResponseWriter) {
-	http.Error(w, "Forbidden", http.StatusForbidden)
-}
-
-// Serialize objects in JSON and send
-func sendJSON(w http.ResponseWriter, obj interface{}) {
-	w.Header().Set("Content-Type", "text/json; charset=utf-8")
-	json.NewEncoder(w).Encode(obj)
-}
-
-// Determine if user is an admin
-func isAdmin(r *http.Request) bool {
-	return r.Header.Get("X-Level") == "1"
-}
-
-// Extract userid from header and return as an integer
-func getUserIdFromHeader(r *http.Request) int {
-	i, _ := strconv.Atoi(r.Header.Get("X-Userid"))
-	return i
-}
-
-// Extract level from header and return as an integer
-func getUserLevelFromHeader(r *http.Request) int {
-	i, _ := strconv.Atoi(r.Header.Get("X-Level"))
-	return i
-}
-
 // getShifts Endpoint: admins can get all shifts of the week, or a specific user's
 // shifts. Workers can just list their own endpoints
 func getShiftsEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -138,4 +98,46 @@ func deleteShiftsEndpoint(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+}
+
+// Other functions used by endpoints
+
+// Log a line if the program is running in verbose mode
+func logLine(format string, v ...interface{}) {
+	if verbose {
+		log.Println(fmt.Sprintf(format, v...))
+	}
+}
+
+// Send errors as 400 - Bad Request
+func sendBadRequest(w http.ResponseWriter, err string) {
+	http.Error(w, err, http.StatusBadRequest)
+}
+
+// Send forbidden
+func sendForbidden(w http.ResponseWriter) {
+	http.Error(w, "Forbidden", http.StatusForbidden)
+}
+
+// Serialize objects in JSON and send
+func sendJSON(w http.ResponseWriter, obj interface{}) {
+	w.Header().Set("Content-Type", "text/json; charset=utf-8")
+	json.NewEncoder(w).Encode(obj)
+}
+
+// Determine if user is an admin
+func isAdmin(r *http.Request) bool {
+	return r.Header.Get("X-Level") == "1"
+}
+
+// Extract userid from header and return as an integer
+func getUserIdFromHeader(r *http.Request) int {
+	i, _ := strconv.Atoi(r.Header.Get("X-Userid"))
+	return i
+}
+
+// Extract level from header and return as an integer
+func getUserLevelFromHeader(r *http.Request) int {
+	i, _ := strconv.Atoi(r.Header.Get("X-Level"))
+	return i
 }
