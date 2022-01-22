@@ -49,7 +49,7 @@ type WorkingPlan struct {
 	Days  [7]Day `json:"days"`
 }
 
-// Checks the workplan has information about a user
+// Checks if the workplan has information about a user
 func (w *WorkingPlan) HasUser(userid int) bool {
 	for _, user := range w.Users {
 		if user.UserId == userid {
