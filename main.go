@@ -10,18 +10,17 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"work-planner/planner"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 )
 
 // Variables
-const port int = 80                 // HTTP server port
-const verbose bool = true           // Verbose bit, for debug
-const kName string = "SIGNKEY17"    // Signin token key environment variable name
-var signKey []byte                  // Key for verify tokens' signature
-var workingPlan planner.WorkingPlan // Working plan variable
+const port int = 80              // HTTP server port
+const verbose bool = true        // Verbose bit, for debug
+const kName string = "SIGNKEY17" // Signin token key environment variable name
+var signKey []byte               // Key for verify tokens' signature
+var workingPlan WorkingPlan      // Working plan variable
 
 // Log a line if the program is running in verbose mode
 func logLine(format string, v ...interface{}) {
@@ -43,8 +42,8 @@ func sendJSON(w http.ResponseWriter, obj interface{}) {
 }
 
 // Parse and validate token. If valid, fill struct user and return it
-func parseToken(token string) (planner.User, error) {
-	var returnUser planner.User
+func parseToken(token string) (User, error) {
+	var returnUser User
 	var retErr error = errors.New("error parsing the token")
 	if len(signKey) == 0 {
 		log.Fatalln("I don't have a signature key") // panic
