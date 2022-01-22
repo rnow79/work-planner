@@ -11,9 +11,7 @@ import (
 // getShifts Endpoint: admins can get all shifts of the week, or a specific user's
 // shifts. Workers can just list their own endpoints
 func getShiftsEndpoint(w http.ResponseWriter, r *http.Request) {
-	logLine("lala")
 	if isAdmin(r) {
-		logLine("admin")
 		// Admin GET Method
 		if userid := r.URL.Query().Get("userid"); len(userid) == 0 {
 			// Without params, send all working plan
