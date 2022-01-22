@@ -71,9 +71,9 @@ func (w *WorkingPlan) getUser(userid int) User {
 }
 
 // Inserts user data in the workplan
-func (w *WorkingPlan) InsertUser(user User) {
-	if !w.HasUser(user.UserId) {
-		newUser := &User{user.User, user.Name, user.Level, user.UserId}
+func (w *WorkingPlan) InsertUser(user string, name string, level int, userid int) {
+	if !w.HasUser(userid) {
+		newUser := &User{user, name, level, userid}
 		w.Users = append(w.Users, *newUser)
 	}
 }
