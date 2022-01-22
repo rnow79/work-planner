@@ -55,6 +55,12 @@ There are three endpoints, but they act different if the user is a or an admin. 
 - `GET http://localhost/{userid}`: return shifts from specific user.
 - `DELETE http://localhost/{userid}{day}{shift}`: delete the shift.
 
+In addition, there is a token generation anonymous endpoint, just for testing.
+
+- `POST http://localhost/token{uid}{nam}{lvl}{usr}`
+
+The api has a static directory with a form at http://localhost/html/token.htm for dealing with the endpoint with ease.
+
 ## Output format
 
 Errors are returned in plain text. All other data is returned as a JSON.
