@@ -32,33 +32,36 @@
     <div id="result"></div>
     <script lang="javascript">
         $("#generate").click(e => {
+            err = false;
             $("input").each((i, e) => {
                 if ($(e).val() == "") {
+                    $("#result").html("");
                     $("#error").fadeOut("fast", function() {$(this).html("Please fill all fields!").fadeIn("slow")})
-                    return;
+                    err = true;
                 }
-                $("#error").html("");
             });
-            const settings = {
-                "async": true,
-                "crossDomain": true,
-                "url": "http://localhost/token",
-                "method": "POST",
-                "headers": {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                "data": {
-                    "nam": $("#nam").val(),
-                    "usr": $("#usr").val(),
-                    "lvl": $("#lvl").val(),
-                    "uid": $("#uid").val(),
-                    "": ""
-                }
-            };
-            
-            $.ajax(settings).done(function (response) {
-                $("#result").html(response);
-            });
+            if (err) return;
+            $("#error").html("");
+                const settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "http://localhost/token",
+                    "method": "POST",
+                    "headers": {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    "data": {
+                        "nam": $("#nam").val(),
+                        "usr": $("#usr").val(),
+                        "lvl": $("#lvl").val(),
+                        "uid": $("#uid").val()
+                    }
+                };
+                
+                $.ajax(settings).done(function (response) {
+                    $("#result").html(response);
+                });
+
         });
     </script>
 </body>
