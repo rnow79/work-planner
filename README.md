@@ -41,7 +41,7 @@ There is no database, week planner shifts will be saved in memory. If the server
 
 ## Endpoints
 
-There are six endpoints. Assuming we are running in localhost, in port 80, we will have:
+There are three endpoints, but they act different if the user is a or an admin. Assuming we are running in localhost, in port 80, we will have:
 
 ### For Workers
 
