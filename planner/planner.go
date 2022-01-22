@@ -43,7 +43,7 @@ type UserShifts struct {
 	Shifts []UserShift `json:"shifts"`
 }
 
-// Working Plan struct
+// WorkingPlan struct
 type WorkingPlan struct {
 	Users []User `json:"users"`
 	Days  [7]Day `json:"days"`
