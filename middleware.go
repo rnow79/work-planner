@@ -10,6 +10,11 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+var signKey []byte                     // Key for verify tokens' signature
+const kName string = "SIGNKEY17"       // Signin token key environment variable name
+const headerName string = "Auth-Token" // Token header name
+
+// Each request must include a header with a valid token, otherwise a forbidden response is sent
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Extract user from token

@@ -12,12 +12,9 @@ import (
 )
 
 // Variables
-const port int = 80                    // HTTP server port
-const verbose bool = true              // Verbose bit, for debug
-const kName string = "SIGNKEY17"       // Signin token key environment variable name
-const headerName string = "Auth-Token" // Token header name
-var signKey []byte                     // Key for verify tokens' signature
-var workingPlan WorkingPlan            // Working plan variable
+const port int = 80         // HTTP server port
+const verbose bool = true   // Verbose bit, for debug
+var workingPlan WorkingPlan // Working plan variable
 
 // Main function
 func main() {
