@@ -28,13 +28,14 @@ func authMiddleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		// Extract user from token.
+		// Extract user data from token.
 		user, err := extractToken(r.Header.Get(headerName))
 		if err != nil {
 			logLine("Error extracting token: %s", err)
 			sendForbidden(w)
 			return
 		}
+		// Insert user data in request headers.
 		r.Header.Set("X-User", user.User)
 		r.Header.Set("X-Name", user.Name)
 		r.Header.Set("X-Level", strconv.Itoa(user.Level))
