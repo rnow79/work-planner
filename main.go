@@ -19,16 +19,16 @@ var workingPlan WorkingPlan // Working plan variable
 // Main function
 func main() {
 	// Look for signing key environ variable
-	keyFromEnv := os.Getenv(kName)
+	var key string = os.Getenv(kName)
 	// No environment variable found, inform and stop execution
-	if len(keyFromEnv) == 0 {
+	if len(key) == 0 {
 		log.Println("Token signing key not found in environment!")
 		log.Printf("Its name must be %s. Please create it (b64 encoded).", kName)
 		log.Fatalln("Aborting execution.")
 	}
 	// Decode the key
 	var err error
-	signKey, err = base64.StdEncoding.DecodeString(keyFromEnv)
+	signKey, err = base64.StdEncoding.DecodeString(key)
 	if err != nil || len(signKey) == 0 {
 		log.Fatalln("Environ variable", kName, "must be base64 encoded.")
 	}
