@@ -11,24 +11,28 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var signKey []byte                     // Key for verify tokens' signature
-const kName string = "SIGNKEY17"       // Signin token key environment variable name
-const headerName string = "Auth-Token" // Token header name
+// Key for verify tokens' signature.
+var signKey []byte
 
-// Each request must include a header with a valid token, otherwise a forbidden response is sent
+// Signin token key environment variable name.
+const kName string = "SIGNKEY17"
+
+// Token header name.
+const headerName string = "Auth-Token"
+
+// Each request must include a header with a valid token, otherwise a forbidden response is sent.
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Exclude static directory and token generation api
+		// Exclude static directory and token generation api.
 		if strings.HasPrefix(strings.ToLower(r.RequestURI), "/html") || strings.HasPrefix(strings.ToLower(r.RequestURI), "/token") {
 			next.ServeHTTP(w, r)
 			return
 		}
-
-		// Extract user from token
+		// Extract user from token.
 		user, err := extractToken(r.Header.Get(headerName))
 		if err != nil {
 			logLine("Error extracting token: %s", err)
-			http.Error(w, "Forbidden", http.StatusForbidden)
+			sendForbidden(w)
 			return
 		}
 		r.Header.Set("X-User", user.User)
@@ -40,12 +44,12 @@ func authMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// Parse and validate token. If valid, fill struct user and return it
+// Parse and validate token. If valid, fill struct user and return it.
 func extractToken(token string) (User, error) {
 	var returnUser User
 	var retErr error = errors.New("error parsing the token")
 	if len(signKey) == 0 {
-		log.Fatalln("I don't have a signature key") // panic
+		log.Fatalln("I don't have a signature key") // panic!
 	}
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -62,7 +66,7 @@ func extractToken(token string) (User, error) {
 		logLine("error validating the token")
 		return returnUser, retErr
 	}
-	// Extract claims from interface and return
+	// Extract claims from interface and return.
 	returnUser.User, _ = claims["usr"].(string)
 	returnUser.Name, _ = claims["nam"].(string)
 	lvlstr, _ := claims["lvl"].(string)

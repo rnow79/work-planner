@@ -134,7 +134,7 @@ func postTokenEndpoint(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalln("Error signing token")
 		}
-		fmt.Fprintf(w, signed)
+		fmt.Fprint(w, signed)
 	}
 }
 

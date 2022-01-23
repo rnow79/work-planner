@@ -2,49 +2,53 @@ package main
 
 import "errors"
 
-// Variables
-const shiftsPerDay int = 3            // Amount of shifts per day
-const maxShiftsPerUserPerDay int = 1  // Maximum shifts a user is allowed to own per day
-const maxShiftsPerUserPerWeek int = 5 // Maximum shifts a user is allowed to own per week
+// Amount of shifts per day.
+const shiftsPerDay int = 3
 
-// User struct
+// Maximum shifts a user is allowed to own per day.
+const maxShiftsPerUserPerDay int = 1
+
+// Maximum shifts a user is allowed to own per week.
+const maxShiftsPerUserPerWeek int = 5
+
+// User struct.
 type User struct {
-	User   string `json:"user"`   // username (ex used for login)
-	Name   string `json:"name"`   // friendly name
-	Level  int    `json:"level"`  // 0 means worker, 1 means admin
-	UserId int    `json:"userid"` // unique user id
+	User   string `json:"user"`   // Username (ex john)
+	Name   string `json:"name"`   // Friendly name (ex John Smith).
+	Level  int    `json:"level"`  // User level: 0 means worker, 1 means admin.
+	UserId int    `json:"userid"` // User id.
 }
 
 // Shift struct
 type Shift struct {
-	Used   bool `json:"used"`
-	Userid int  `json:"userid"`
+	Used   bool `json:"used"`   // Shift is used or not.
+	Userid int  `json:"userid"` // User id.
 }
 
 // Day struct
 type Day struct {
-	Shifts [shiftsPerDay]Shift `json:"shifts"`
+	Shifts [shiftsPerDay]Shift `json:"shifts"` // Each day contains 3 shifts.
 }
 
-// UserShift struct
+// UserShift struct: used with UserShifts.
 type UserShift struct {
-	Day   int `json:"day"`
-	Shift int `json:"shift"`
+	Day   int `json:"day"`   // Day of the shift.
+	Shift int `json:"shift"` // Numer of shift.
 }
 
-// UserShifts struct
+// UserShifts struct: Used for return all shifts of a particular user.
 type UserShifts struct {
-	Userid int         `json:"userid"`
-	Shifts []UserShift `json:"shifts"`
+	Userid int         `json:"userid"` // User id.
+	Shifts []UserShift `json:"shifts"` // Array of shifts.
 }
 
-// WorkingPlan struct
+// WorkingPlan struct.
 type WorkingPlan struct {
-	Users []User `json:"users"`
-	Days  [7]Day `json:"days"`
+	Users []User `json:"users"` // Array of users who have shifts.
+	Days  [7]Day `json:"days"`  // Seven days of the week.
 }
 
-// Checks if the workplan has information about a user
+// Checks if the workplan has information about a user.
 func (w *WorkingPlan) HasUser(userid int) bool {
 	for _, user := range w.Users {
 		if user.UserId == userid {
@@ -54,18 +58,7 @@ func (w *WorkingPlan) HasUser(userid int) bool {
 	return false
 }
 
-// Returns user data from the workplan
-func (w *WorkingPlan) getUser(userid int) User {
-	u := &User{}
-	for _, user := range w.Users {
-		if user.UserId == userid {
-			return user
-		}
-	}
-	return *u
-}
-
-// Inserts user data in the workplan
+// Inserts user data in the workplan.
 func (w *WorkingPlan) InsertUser(user string, name string, level int, userid int) {
 	if !w.HasUser(userid) {
 		newUser := &User{user, name, level, userid}
@@ -73,7 +66,7 @@ func (w *WorkingPlan) InsertUser(user string, name string, level int, userid int
 	}
 }
 
-// Deletes user data from the workplan
+// Deletes user data from the workplan.
 func (w *WorkingPlan) deleteUser(userid int) {
 	for index, user := range w.Users {
 		if user.UserId == userid {
@@ -83,7 +76,7 @@ func (w *WorkingPlan) deleteUser(userid int) {
 	}
 }
 
-// Tells the number of shifts some user has in the entire week
+// Tells the number of shifts some user has in the entire week.
 func (w *WorkingPlan) getUserShifCount(userid int) (count int) {
 	for _, day := range w.Days {
 		for _, shift := range day.Shifts {
@@ -95,7 +88,7 @@ func (w *WorkingPlan) getUserShifCount(userid int) (count int) {
 	return
 }
 
-// Gets user shifts
+// Gets user shifts.
 func (w *WorkingPlan) GetUserShifts(userid int) (userShifts UserShifts) {
 	userShifts.Userid = userid
 	for iday, day := range w.Days {
@@ -109,7 +102,7 @@ func (w *WorkingPlan) GetUserShifts(userid int) (userShifts UserShifts) {
 	return
 }
 
-// Gets the shifts of an user a specific day
+// Gets the shifts of an user a specific day.
 func (w *WorkingPlan) GetUserShiftsCountByDay(userid int, day int) (shifts int) {
 	if !IsValidDay(day) {
 		return
@@ -122,7 +115,7 @@ func (w *WorkingPlan) GetUserShiftsCountByDay(userid int, day int) (shifts int) 
 	return
 }
 
-// Inserts a shift
+// Inserts a shift.
 func (w *WorkingPlan) InsertUserShift(userid int, day int, shift int) error {
 	if !IsValidDay(day) {
 		return errors.New("invalid day")
@@ -144,7 +137,7 @@ func (w *WorkingPlan) InsertUserShift(userid int, day int, shift int) error {
 	return nil
 }
 
-// Deletes a shift
+// Deletes a shift.
 func (w *WorkingPlan) DeleteUserShift(userid int, day int, shift int) error {
 	if !IsValidDay(day) {
 		return errors.New("invalid day")
@@ -158,14 +151,14 @@ func (w *WorkingPlan) DeleteUserShift(userid int, day int, shift int) error {
 	} else {
 		return errors.New("user does not own the shift")
 	}
-	// If user has no remaining shifts in the planner, delete his data from planner
+	// If user has no remaining shifts in the planner, delete his data from planner.
 	if w.getUserShifCount(userid) == 0 {
 		w.deleteUser(userid)
 	}
 	return nil
 }
 
-// Valid days are from 0 to 6
+// Valid days are from 0 to 6.
 func IsValidDay(day int) bool {
 	if day >= 0 && day < 7 {
 		return true
@@ -173,7 +166,7 @@ func IsValidDay(day int) bool {
 	return false
 }
 
-// Valid shifts are from 0 to shiftsPerDay constant
+// Valid shifts are from 0 to shiftsPerDay constant.
 func IsValidShift(shift int) bool {
 	if shift >= 0 && shift < shiftsPerDay {
 		return true
