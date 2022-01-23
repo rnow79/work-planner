@@ -40,7 +40,7 @@ func authMiddleware(next http.Handler) http.Handler {
 		r.Header.Set("X-Name", user.Name)
 		r.Header.Set("X-Level", strconv.Itoa(user.Level))
 		r.Header.Set("X-Userid", strconv.Itoa(user.UserId))
-		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		// Call the endpoint.
 		next.ServeHTTP(w, r)
 	})
 }
