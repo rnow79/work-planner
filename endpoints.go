@@ -78,27 +78,58 @@ func postShiftsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 // deleteShiftsEndpoint: workers can delete their own shifts. Admins can delete any shift.
 func deleteShiftsEndpoint(w http.ResponseWriter, r *http.Request) {
-	// Worker DELETE Method.
-	if day, shift := r.URL.Query().Get("day"), r.URL.Query().Get("shift"); len(day) == 0 || len(shift) == 0 {
-		// Missing parameters.
-		sendBadRequest(w, "missing day or shift")
-		return
+	if isAdmin(r) {
+		// Admin DELTE Method.
+		if day, shift, userid := r.URL.Query().Get("day"), r.URL.Query().Get("shift"), r.URL.Query().Get("userid"); len(day) == 0 || len(shift) == 0 || len(userid) == 0 {
+			// Missing parameters.
+			sendBadRequest(w, "missing day, shift, or userid")
+			return
+		} else {
+			day, err := strconv.Atoi(day)
+			if err != nil {
+				sendBadRequest(w, "day must be numeric")
+				return
+			}
+			shift, err := strconv.Atoi(shift)
+			if err != nil {
+				sendBadRequest(w, "shift must be numeric")
+				return
+			}
+			userid, err := strconv.Atoi(userid)
+			if err != nil {
+				sendBadRequest(w, "userid must be numeric")
+				return
+			}
+			// Try to delete user shift.
+			err = workingPlan.DeleteUserShift(userid, day, shift)
+			if err != nil {
+				sendBadRequest(w, err.Error())
+				return
+			}
+		}
 	} else {
-		day, err := strconv.Atoi(day)
-		if err != nil {
-			sendBadRequest(w, "day must be numeric")
+		// Worker DELETE Method.
+		if day, shift := r.URL.Query().Get("day"), r.URL.Query().Get("shift"); len(day) == 0 || len(shift) == 0 {
+			// Missing parameters.
+			sendBadRequest(w, "missing day or shift")
 			return
-		}
-		shift, err := strconv.Atoi(shift)
-		if err != nil {
-			sendBadRequest(w, "shift must be numeric")
-			return
-		}
-		// Try to delete user shift.
-		err = workingPlan.DeleteUserShift(getUserIdFromHeader(r), day, shift)
-		if err != nil {
-			sendBadRequest(w, err.Error())
-			return
+		} else {
+			day, err := strconv.Atoi(day)
+			if err != nil {
+				sendBadRequest(w, "day must be numeric")
+				return
+			}
+			shift, err := strconv.Atoi(shift)
+			if err != nil {
+				sendBadRequest(w, "shift must be numeric")
+				return
+			}
+			// Try to delete user shift.
+			err = workingPlan.DeleteUserShift(getUserIdFromHeader(r), day, shift)
+			if err != nil {
+				sendBadRequest(w, err.Error())
+				return
+			}
 		}
 	}
 }
